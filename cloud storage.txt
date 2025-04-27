@@ -1,0 +1,46 @@
+Prac 3
+Iam policy code: 
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": "arn:aws:s3:::cloud-practice3"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::cloud-practice3/*"
+    }
+  ]
+}
+
+Generate access key in security credentials tab of user
+
+Cmd commands:
+aws configure
+(enter credentials)
+aws s3 cp filename s3://bucketname
+aws s3 ls s3://bucketname
+aws s3 cp s3://bucketname/filename .
+
+C:\Users\Toshita>aws --version
+aws-cli/2.26.1 Python/3.13.2 Windows/11 exe/AMD64
+
+C:\Users\Toshita>aws configure
+AWS Access Key ID [None]: 
+AWS Secret Access Key [None]: 
+Default region name [None]: ap-south-1
+Default output format [None]: json
+C:\Users\Toshita>echo "This is test file of cloud sec prac 3" > testfile.txt
+
+C:\Users\Toshita>aws s3 cp testfile.txt s3://cloudsecurityprac3/
+upload: .\testfile.txt to s3://cloudsecurityprac3/testfile.txt
+C:\Users\Toshita>aws s3 cp s3://cloudsecurityprac3/testfile.txt .
+download: s3://cloudsecurityprac3/testfile.txt to .\testfile.txt
+
+C:\Users\Toshita>aws s3 ls s3://cloudsecurityprac3/
+2025-04-14 16:46:38    3466839 DSC_0321_1~2.NEF.jpg
+2025-04-14 16:46:36     523216 assgn.pdf
+2025-04-14 17:02:13         42 testfile.txt

@@ -1,0 +1,34 @@
+Prac9
+1. Login to AWS console 
+2. create ec2 machine
+•	Select amazon linux
+•	T2.micro
+•	Create new key pair
+•	Edit network:
+o	Ssh port 22 source type: custom source: 0.0.0.0/0
+o	Add rule
+o	Http port 80 source type: custom source: 0.0.0.0/0
+Done Launch instance
+3. Open MobaXterm:
+o	Click session -> SSH
+o	Remote Host: Public IP of instance
+o	Username: ec2-user
+o	Advanced setting: use private key
+4. install httpd webserver in machine(used to run web app) 
+sudo su 
+yum update -y 
+yum install httpd -y 
+cd /var/www/html
+create website vi index.html or name.html
+		cat name.html (To see contents)
+service httpd start (or service https restart)
+6. Go to browser and type: http://ipaddres/name.html
+
+For secure:
+Ec2 -> dashboard -> security groups -> select your(check instance to determine security group) -> edit inbound rules
+For ssh connect only one device by : yourip/32  curl ifconfig.me
+32 = only 1 device can access
+For your ip in cmd: C:\Users\Toshita>curl ifconfig.me
+106.213.87.176
+
+Paste this in the source of ssh save
