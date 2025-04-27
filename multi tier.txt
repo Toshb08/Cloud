@@ -88,6 +88,11 @@ b.	Edit Inbound rules  Add rule
 •	custom TCP 80 Source: my-alb-sg
 
 12.	Go to LB, copy DNS name Paste to Browser
+If it is not loading- in mobaxterm exit session, login again as private user and enter
+       sudo systemctl status httpd
+       sudo systemctl start httpd
+Paste dns name in separate browser
+
 13.	Go to Mobaxterm  Login private server  enter commands:
 cd /var/www/html/
 echo “Server 1” > index.html
@@ -100,9 +105,9 @@ a.	Choose 2 AZ  choose 2-db-subnets
 a.	Standard create 
 b.	MySQL 
 c.	free tier 
-d.	Put pswd (Toshita 8) 
+d.	Put pswd (Toshita8) 
 e.	t4g.micro
-f.	Disable storage autoscaling
+f.	(Advance settings)Disable storage autoscaling
 g.	select myVPC
 h.	Select my-db-subnet-grp
 i.	Create New security Grp (my-db-sg) AZ: 1a
