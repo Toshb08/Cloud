@@ -1,0 +1,24 @@
+import os
+from Crypto.Cipher import AES 
+from Crypto.Random import get_random_bytes
+
+def encryption(input, output, key):
+    with open(input, "rb") as f:
+        plaintext = f.read()
+    cipher = AES.new(key, AES.MODE_GCM)
+    ciphertext, tag = cipher.encrypt_and_digest(plaintext)
+    with open(output, "wb") as f:
+        f.write(ciphertext + tag + cipher.nonce)
+    print(f"Encrypted: {input} -> {output}")
+
+def delete(file):
+    if os.path.exists(file):
+        os.remove(file)
+        print(f"{file} deleted successfully")
+    else:
+        print(f"{file} not found")
+
+key = get_random_bytes(32)
+encryption("del.txt", "del_e.bin", key)
+
+delete("del.txt")

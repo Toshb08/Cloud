@@ -1,0 +1,40 @@
+from Crypto.Cipher import AES 
+from Crypto.Random import get_random_bytes
+
+def pad(data):
+    padding_len = 16 - len(data) % 16
+    return data + bytes([padding_len] * padding_len)
+
+def unpad(data):
+    return data[:-data[-1]]
+
+def encryption(input, output, key):
+    with open(input, "rb") as f:
+        plaintext = pad(f.read())
+    iv = get_random_bytes(16)
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    ciphertext = cipher.encrypt(plaintext)
+    with open(output, "wb") as f:
+        f.write(iv + ciphertext)
+    print(f"Encrypted: {input} -> {output}")
+
+def decryption(input, output, key):
+    with open(input, "rb") as f:
+        iv = f.read(16)
+        ciphertext = f.read()
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    plaintext = unpad(cipher.decrypt(ciphertext))
+    with open(output, "wb") as f:
+        f.write(plaintext)
+    print(f"Decrypted: {input} -> {output}")
+
+key = get_random_bytes(32)
+with open("aes.bin", "wb") as f:
+    f.write(key)
+
+encryption("prac5.txt", "prac5e.txt", key)
+
+with open("aes.bin", "rb") as f:
+    f.read()
+
+decryption("prac5e.txt", "prac5d.txt", key)
