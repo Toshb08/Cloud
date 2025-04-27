@@ -1,0 +1,125 @@
+STEPS: 
+1.	Create VPC (172.20.0.0/20)
+2.	create 9 Subnets
+a.	my-public-web-subnet (1, 2, 3)
+b.	my-private-app-subnet (4-6)
+c.	my-private-do-subnet (7-9)
+d.	172.20.1.0/24 - 172.20.9.0/24
+3.	Create 3 Route Tables
+a.	my-public-web-route
+b.	private-app-
+c.	- db –
+4.	Click each route Subnet Associations (Edit)
+a.	my-pub-web-route  public subnets
+b.	my-pri-app → private
+c.	my-pri-db = db subnets
+5.	 Create Internet Gateway
+a.	 Attach to VPC
+6.	Create NAT Gateway 
+a.	Select Public subnet 1
+b.	Allocate Elastic IP
+7.	Go to routes:
+a.	public-web-route Routes (Edit)→ Add route: 0.0.0.0/0 select IGW
+b.	private-app-route Routes (Edit) →Add route: 0.0.0.0/0 Select NAT
+c.	private-db-route Routes (Edit) →Add route: 0.0.0.0/0 Select NAT
+8.	Launch instances (my-jump-server)
+a.	Amazon Linux 2 AMI, t2.micro
+b.	select myVPC and public subnet
+c.	Enable: Auto assign I
+d.	create new security grp (my-jump-server-sg)
+e.	create key pair DONE
+Similarly for my-php-app-server-1 & my-php-app-server-2
+f.	t2.micro Amazon Linux 2 AMI
+g.	Select myVPC and private-app-subnet-1
+h.	create new security grp (my-app-ser-sg)
+•	Inbound Type: SSH 22 Source: my-jump-sq
+i.	use same key pair
+
+9.	Go to mobaxterm do same and connect my-jump-server in mobaxterm
+a.	 in left panel, upload .pem key pair.
+(Connect to private server thru public)
+b.	copy chmod 400 command of private-server
+c.	Run ssh -i command
+Logged in to appserver now
+Go to that link (tutorial' install lamp server amazon Linux 2)
+Run the commands
+
+sudo yum update -y
+sudo amazon-linux-extras install mariadb10.5
+sudo amazon-linux-extras install php8.2
+sudo yum install -y httpd
+sudo systemctl start httpd
+sudo systemctl enable httpd
+sudo systemctl is-enabled httpd
+curl http://localhost
+sudo usermod -a -G apache ec2-user
+exit
+login in private server again
+groups
+sudo chown -R ec2-user:apache /var/www
+sudo chmod 2775 /var/www && find /var/www -type d -exec sudo chmod 2775 {} \;
+find /var/www -type f -exec sudo chmod 0664 {} \;
+sudo yum install php-mbstring php-xml -y
+sudo systemctl restart httpd
+sudo systemctl restart php-fpm
+cd /var/www/html
+wget https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.tar.gz
+mkdir phpMyAdmin && tar -xvzf phpMyAdmin-latest-all-languages.tar.gz -C phpMyAdmin --strip-components 1
+rm phpMyAdmin-latest-all-languages.tar.gz
+
+10.	Create Load Balancer (my-alb)
+a.	Select Application Load B.
+b.	Internet facing.
+c.	Select 2 avai zones - Public subnets
+d.	Create New security grp (my-alb-sg)
+•	Outbound HTTP 80 Desti  0.0.0.0/0
+•	Inbound: HTTP 80  Src  0.0.0.0/0
+       SSH 22  SRC  0.0.0.0/0
+e.	Create Target Group (my - alb-tg)
+•	Target type: Instance
+•	Protocol version: HTTP-1
+•	Protocol: HTTP 80
+•	Register Targets: select private-app-server
+Click as pending  create
+
+11.	Go to instances my-php-app-server-1 
+a.	Go to security  Security Group  my-app-server-sg
+b.	Edit Inbound rules  Add rule
+•	custom TCP 80 Source: my-alb-sg
+
+12.	Go to LB, copy DNS name Paste to Browser
+13.	Go to Mobaxterm  Login private server  enter commands:
+cd /var/www/html/
+echo “Server 1” > index.html
+Go to browser DNS-name/index.html
+
+14.	Go to RDS  subnet grp (my-db-sb-grps) 
+a.	Choose 2 AZ  choose 2-db-subnets
+
+15.	Create DB. (my-db)
+a.	Standard create 
+b.	MySQL 
+c.	free tier 
+d.	Put pswd (Toshita 8) 
+e.	t4g.micro
+f.	Disable storage autoscaling
+g.	select myVPC
+h.	Select my-db-subnet-grp
+i.	Create New security Grp (my-db-sg) AZ: 1a
+
+16.	Go to my-db 
+a.	Connectivity & Security  my-db-sg (VPC security groups)
+•	Edit Inbound Rules:
+•	Custom TCP 3306 src: my-php-app-sq
+•	Delete the default inbound rule.
+
+17.	Go to my-db  copy Endpoint
+In mobaxterm run commands: 
+ls
+cd phpMyAdmin/
+ls
+mv config.sample.inc.php config.inc.php
+vi config.inc.php
+search for hosts, press I to insert replace ‘localhost’ with ‘Endpoint’ of my-alb, esc :wq to save and quit
+
+Go to browser: DNSname/phpMyAdmin
