@@ -16,6 +16,7 @@ Iam policy code:
   ]
 }
 
+Create user and attach iam policy
 Generate access key in security credentials tab of user
 
 Cmd commands:
